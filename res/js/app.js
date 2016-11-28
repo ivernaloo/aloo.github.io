@@ -13,4 +13,16 @@ $(function(){
 // on load of the page: switch to the currently selected tab
     var hash = window.location.hash;
     $('.nav-tabs a[href="' + hash + '"]').tab('show');
+
+    var IMGS = $('img[update="refresh"]');
+
+    function updateImage() {
+        IMGS.each(function(i, item){
+            item.src = item.src.split("?")[0] + "?" + new Date().getTime();
+            console.log("update")
+            
+        });
+    }
+
+    setInterval(updateImage, 60000);
 });
