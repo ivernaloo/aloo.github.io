@@ -1,13 +1,24 @@
 var express = require('express');
 var app = express();
-var fs = require("fs");
+var fs = require("fs"),
+    PATH = "/users.json";
 
+function getData() {
+    return fs.readFileSync(__dirname + PATH,'utf8');
+}
+
+/*
+* 写入data数据到json里面
+* data {object} 全量的数据
+* */
+function write(data) {
+    return fs.writeFileSync(__dirname + PATH, data);
+}
 // 获取用户列表：
 app.get('/list', function (req, res) {
-    fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-        console.log( data );
-        res.end( data );
-    });
+    var data = getData();
+
+    res.end( data );
 });
 
 
@@ -23,42 +34,39 @@ var user = {
 
 app.get('/add', function (req, res) {
     // 读取已存在的数据
-    fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-        data = JSON.parse( data );
-        data["user4"] = user["user4"];
-        console.log( data );
-        res.end( JSON.stringify(data));
-    });
+    var data = getData();
+    data = Object.assign(JSON.parse(data), JSON.parse(req.query.item));
+
+    write(JSON.stringify(data));
+    res.end(JSON.stringify({"res": 0}));
+});
+
+app.get('/delete', function (req, res) {
+    var data = getData();
+    console.log(".....")
+    data = JSON.parse( data );
+    delete data[req.query.name];
+
+    write(JSON.stringify(data));
+    res.end( JSON.stringify(data));
+
 });
 
 app.get('/:id', function (req, res) {
     // 首先我们读取已存在的用户
-    fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-        data = JSON.parse( data );
-        var user = data["user" + req.params.id]
-        console.log( user );
-        res.end( JSON.stringify(user));
-    });
-})
-
-
-app.get('/deleteUser', function (req, res) {
-
-    // First read existing users.
-    fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-        data = JSON.parse( data );
-        delete data["user" + 2];
-
-        console.log( data );
-        res.end( JSON.stringify(data));
-    });
-})
+    var data = getData();
+    console.log("id")
+    data = JSON.parse( data );
+    var user = data[req.params.id];
+    console.log(user);
+    res.end( JSON.stringify(user));
+});
 
 var server = app.listen(3000, function () {
 
     var host = server.address().address
     var port = server.address().port
 
-    console.log("应用实例，访问地址为 http://%s:%s", host, port)
+    console.log("PV on http://%s:%s", host, port)
 
-})
+});
