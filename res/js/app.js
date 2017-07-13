@@ -25,4 +25,7 @@ $(function(){
     }
 
     setInterval(updateImage, 60000);
+
+    console.log("Hello! new world!");
+    console.log("This is a entry for Scrape!")
 });
